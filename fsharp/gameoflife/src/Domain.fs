@@ -6,31 +6,18 @@ type Cell =
 |Dead of CellInfo 
 |Live of CellInfo
 
-type Grid = {Size:(int * int); Cells:list<Cell>;}
-
-module Grid =
-    type Evolve = Cell -> list<Cell> -> Cell
-    
-    let private findCell grid coords =
-        let predicate = 
-            fun cell ->
-                match cell with
-                    |Live c -> c=coords
-                    |Dead c -> c=coords
-
-        let found = grid.Cells |> List.filter predicate
-        if found.Length>0 then
-            Some(found.Head)
-        else
-            None
+type Cells = list<Cell>
 
 
-    let read grid coords =
-        let cell = findCell grid coords
+module Grid=
+    type Evolve = Cells -> Cells
+    type private EvolveCell = Cell -> list<Cell> -> Cell
+
+    let cellCoordinates cell=
         match cell with
-            | Some c -> c
-            | None -> Dead(coords)
-    
+            |Live c -> c
+            |Dead c-> c
+
     let isLive cell =
         match cell with
             |Live _ -> true
@@ -38,13 +25,35 @@ module Grid =
 
     let isDead cell =
         not(isLive cell)
+
+    let private cellPredicate coords =
+        fun cell ->
+                match cell with
+                    |Live c -> c=coords
+                    |Dead c -> c=coords
+
+    let private findCell cells coord =
+           List.tryFind (cellPredicate coord) (cells) 
+
+    let obtainCell grid coords =
+        let cell = findCell grid coords
+        match cell with
+            | Some c -> c
+            | None -> Dead(coords)
+
+    let private findCells grid coords =
+        coords |> List.map (fun c -> (obtainCell grid c))
     
-    
+    let obtainNeighbors grid cell =
+        let (x,y) = cellCoordinates cell
+        [(x-1,y-1); (x-1,y); (x,y-1); (x-1,y+1); (x+1,y-1); (x,y+1); (x+1,y); (x+1,y+1)] |>
+        List.filter (fun (x,y)->x>=0 && y>=0) |>
+        findCells grid
 
 module GoL = 
-    type Init = (int*int) -> list<Cell> -> Grid
+    type Init = (int*int) -> list<Cell> -> Cells
     type Run = unit -> unit
     
     let init : Init = 
-        fun gridSize cells ->
-            {Size=gridSize; Cells=cells}
+        fun size cells -> cells
+            
