@@ -1,7 +1,8 @@
 ﻿// Learn more about F# at http://fsharp.org
 
 open System
-open GameOfLife
+open View
+open Domain
 
 [<EntryPoint>]
 let main argv =

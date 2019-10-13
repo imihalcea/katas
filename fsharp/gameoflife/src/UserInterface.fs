@@ -1,4 +1,4 @@
-module GameOfLife
+module View
  
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
