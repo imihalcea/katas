@@ -54,11 +54,10 @@ module Grid=
         |> List.length
 
     let evolveCell cells cell=
-        let (x,y) = cellCoordinates cell
-        match (numberOfLivingNeighbors cells cell) with
-        |n when (n=3 && (isDead cell)) -> Live(x,y)
-        |n when (isLive cell) && (n=2 || n=3) -> Live(x,y)
-        |_ -> Dead(x,y)
+        match (cell,(numberOfLivingNeighbors cells cell)) with
+        |(Dead(x,y),n) when n=3 -> Live(x,y)
+        |(Live(x,y),n) when n=2 || n=3 -> Live(x,y)
+        |_ -> Dead(cellCoordinates cell)
    
     let evolve : Evolve =
         fun cells -> 
@@ -71,9 +70,6 @@ module Grid=
 
 module GoL = 
     type Init = list<(int*int)> -> Cells
-    type Run = unit -> unit
-    
     let init : Init = 
         fun cells -> 
             cells |> List.map (fun c -> Live(c))
-            
