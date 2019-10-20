@@ -70,9 +70,10 @@ module Grid=
             |> List.filter isLive
 
 module GoL = 
-    type Init = list<Cell> -> Cells
+    type Init = list<(int*int)> -> Cells
     type Run = unit -> unit
     
     let init : Init = 
-        fun cells -> cells
+        fun cells -> 
+            cells |> List.map (fun c -> Live(c))
             

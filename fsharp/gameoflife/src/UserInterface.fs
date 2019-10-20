@@ -13,8 +13,9 @@ type GameUI (cellSize:int, initalState:Cells, fUpdade:Evolve) as x =
     let cellSize = cellSize
     do x.Content.RootDirectory <- "Content"
     let graphics = new GraphicsDeviceManager(x)
-    //do graphics.SynchronizeWithVerticalRetrace <- true
-    do x.TargetElapsedTime <- TimeSpan.FromSeconds(0.15)
+    do graphics.SynchronizeWithVerticalRetrace <- false
+    do x.TargetElapsedTime <- TimeSpan.FromSeconds(0.05)
+    do graphics.ApplyChanges();
     do x.IsFixedTimeStep <- true
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
  
@@ -23,7 +24,7 @@ type GameUI (cellSize:int, initalState:Cells, fUpdade:Evolve) as x =
         //do graphics.PreferredBackBufferWidth <- 1920;
         //do graphics.PreferredBackBufferHeight <- 1080;
         //do graphics.IsFullScreen <- true;
-        //do graphics.ApplyChanges();
+
         do base.Initialize()
         ()
     
