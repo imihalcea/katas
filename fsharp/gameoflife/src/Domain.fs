@@ -8,11 +8,9 @@ type Cell =
 
 type Cells = list<Cell>
 
+type Evolve = Cells->Cells
 
 module Grid=
-    type Evolve = Cells -> Cells
-    type private EvolveCell = Cell -> list<Cell> -> Cell
-
     let cellCoordinates cell=
         match cell with
             |Live c -> c
@@ -49,11 +47,32 @@ module Grid=
         [(x-1,y-1); (x-1,y); (x,y-1); (x-1,y+1); (x+1,y-1); (x,y+1); (x+1,y); (x+1,y+1)] |>
         List.filter (fun (x,y)->x>=0 && y>=0) |>
         findCells grid
+    
+    let numberOfLivingNeighbors grid cell =
+        (grid,cell) ||> obtainNeighbors 
+        |> List.filter isLive 
+        |> List.length
+
+    let evolveCell cells cell=
+        let (x,y) = cellCoordinates cell
+        match (numberOfLivingNeighbors cells cell) with
+        |n when (n=3 && (isDead cell)) -> Live(x,y)
+        |n when (isLive cell) && (n=2 || n=3) -> Live(x,y)
+        |_ -> Dead(x,y)
+   
+    let evolve : Evolve =
+        fun cells -> 
+            cells 
+            |> List.collect (fun c -> obtainNeighbors cells c)
+            |> List.append cells
+            |> List.distinct
+            |> List.map (fun c -> evolveCell cells c)
+            |> List.filter isLive
 
 module GoL = 
-    type Init = (int*int) -> list<Cell> -> Cells
+    type Init = list<Cell> -> Cells
     type Run = unit -> unit
     
     let init : Init = 
-        fun size cells -> cells
+        fun cells -> cells
             
